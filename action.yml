@@ -11,3 +11,6 @@ runs:
   using: docker
   image: Dockerfile
   entrypoint: "/app/entrypoint.sh"
+  env:
+    PARASOL_USERNAME: ${{ inputs.parasol-username }}
+    PARASOL_PASSWORD: ${{ inputs.parasol-password }}

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python lock.py
+python /app/lock.py

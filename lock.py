@@ -4,8 +4,8 @@ import os
 from playwright.sync_api import Playwright, sync_playwright, expect
 
 
-username = os.environ["INPUT_PARASOL-USERNAME"]
-password = os.environ["INPUT_PARASOL-PASSWORD"]
+username = os.environ["PARASOL_USERNAME"]
+password = os.environ["PARASOL_PASSWORD"]
 
 today = datetime.date.today()
 monday = today + datetime.timedelta(days=7 - today.weekday())
