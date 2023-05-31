@@ -5,7 +5,7 @@ RUN pip install playwright
 
 WORKDIR /app
 
-COPY lock.py /app/
-COPY entrypoint.sh /app/entrypoint.sh
+COPY lock.py ./
+COPY entrypoint.sh ./
 
 ENTRYPOINT ["./entrypoint.sh"]
