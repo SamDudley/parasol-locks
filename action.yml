@@ -1,0 +1,13 @@
+name: Parasol Locks
+description: Automate creating locks in the parasol portal
+inputs:
+  parasol-username:
+    description: Parasol username
+    required: true
+  parasol-password:
+    description: Parasol password
+    required: true
+runs:
+  using: docker
+  image: Dockerfile
+  entrypoint: "/app/entrypoint.sh"

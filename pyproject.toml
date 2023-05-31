@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "parasol-locks"
+version = "0.1.0"
+description = "Automate creating locks in the parasol portal"
+authors = ["Sam Dudley <dudley.co.uk@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "parasol_locks"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+playwright = "^1.34.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
