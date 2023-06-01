@@ -7,6 +7,23 @@ inputs:
   parasol-password:
     description: Parasol password
     required: true
+  tax-period:
+    description: Either "weekly" (default) or "monthly"
+    required: false
+  start-lock:
+    description: Either a day of the month ("1") or of the week ("Monday")
+    required: false
+  end-lock:
+    description: Either a day of the month ("26") or of the week ("Friday")
+    required: false
+outputs:
+  success:
+    description: 'A boolean (1 or 0) indicating whether the action was successful'
+  start-date:
+    description: 'The date the lock was started for in YYYY-MM-DD format'
+  end-date:
+    description: 'The date the lock was created until in YYYY-MM-DD format'
+
 runs:
   using: docker
   image: Dockerfile
@@ -14,3 +31,6 @@ runs:
   env:
     PARASOL_USERNAME: ${{ inputs.parasol-username }}
     PARASOL_PASSWORD: ${{ inputs.parasol-password }}
+    TAX_PERIOD: ${{ inputs.tax-period }}
+    TAX_PERIOD_START: ${{ inputs.start-lock }}
+    TAX_PERIOD_END: ${{ inputs.end-lock }}
