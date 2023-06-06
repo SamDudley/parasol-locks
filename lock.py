@@ -78,7 +78,7 @@ def run(playwright: Playwright) -> None:
 def process_date_inputs():
     input_period = os.environ.get("TAX_PERIOD", "Weekly")
     input_start = os.environ.get("TAX_PERIOD_START", "Monday")
-    input_end = os.environ.get("TAX_PERIOD_END", "Friday")
+    input_end = os.environ.get("TAX_PERIOD_END", "Thursday")
 
     if input_period.lower() == "monthly":
         start, end = get_monthly_params(input_start, input_end)

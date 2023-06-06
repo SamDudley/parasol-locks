@@ -8,13 +8,13 @@ inputs:
     description: Parasol password
     required: true
   tax-period:
-    description: Either "weekly" (default) or "monthly"
+    description: Either "Weekly" (default) or "Monthly"
     required: false
   start-lock:
     description: Either a day of the month ("1") or of the week ("Monday")
     required: false
   end-lock:
-    description: Either a day of the month ("26") or of the week ("Friday")
+    description: Either a day of the month ("26") or of the week ("Thursday")
     required: false
 outputs:
   success:
