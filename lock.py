@@ -157,6 +157,13 @@ with sync_playwright() as playwright:
     try:
         run(playwright)
         print("Finished")
+        # NB super important these are the last two lines printed
+        print(f'{os.environ["OUTPUT_START_DATE"]}')
+        print(f'{os.environ["OUTPUT_END_DATE"]}')
+
     except Exception as e:
-        print(e)
+        print(e, file=sys.stderr)
+        # NB super important these are the last two lines printed
+        print(f'{os.environ["OUTPUT_START_DATE"]}')
+        print(f'{os.environ["OUTPUT_END_DATE"]}')
         sys.exit(1)
