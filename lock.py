@@ -5,8 +5,11 @@ import sys
 from playwright.sync_api import Playwright, sync_playwright, expect
 
 
-username = os.environ["PARASOL_USERNAME"]
-password = os.environ["PARASOL_PASSWORD"]
+PARASOL_USERNAME = os.environ["PARASOL_USERNAME"]
+PARASOL_PASSWORD = os.environ["PARASOL_PASSWORD"]
+TAX_PERIOD = os.environ["TAX_PERIOD"]
+TAX_PERIOD_START = os.environ["TAX_PERIOD_START"]
+TAX_PERIOD_END = os.environ["TAX_PERIOD_END"]
 
 
 def run(playwright: Playwright) -> None:
@@ -26,8 +29,12 @@ def run(playwright: Playwright) -> None:
     # Login page
     try:
         page.goto("https://portal.myparasol.co.uk/Login.aspx")
-        page.locator("#ctl00_ctl00_mainContent_main_userLogin_UserName").fill(username)
-        page.locator("#ctl00_ctl00_mainContent_main_userLogin_Password").fill(password)
+        page.locator("#ctl00_ctl00_mainContent_main_userLogin_UserName").fill(
+            PARASOL_USERNAME
+        )
+        page.locator("#ctl00_ctl00_mainContent_main_userLogin_Password").fill(
+            PARASOL_PASSWORD
+        )
         page.get_by_role("button", name="Login now").click()
         print("Login successful")
     except Exception:
@@ -75,16 +82,13 @@ def run(playwright: Playwright) -> None:
     browser.close()
 
 
-def process_date_inputs():
-    input_period = os.environ.get("TAX_PERIOD", "Weekly")
-    input_start = os.environ.get("TAX_PERIOD_START", "Monday")
-    input_end = os.environ.get("TAX_PERIOD_END", "Thursday")
-
-    if input_period.lower() == "monthly":
-        start, end = get_monthly_params(input_start, input_end)
+def process_date_inputs() -> tuple[datetime.date, datetime.date]:
+    if TAX_PERIOD.lower() == "monthly":
+        start, end = get_monthly_params(TAX_PERIOD_START, TAX_PERIOD_END)
+    elif TAX_PERIOD.lower() == "weekly":
+        start, end = get_weekly_params(TAX_PERIOD_START, TAX_PERIOD_END)
     else:
-        # Default to weekly
-        start, end = get_weekly_params(input_start, input_end)
+        raise ValueError("Invalid tax period")
 
     # Write calculated values to GHA output
     os.environ["OUTPUT_START_DATE"] = f"{start:%Y-%m-%d}"
@@ -93,7 +97,9 @@ def process_date_inputs():
     return start, end
 
 
-def get_monthly_params(input_start, input_end):
+def get_monthly_params(
+    input_start: str, input_end: str
+) -> tuple[datetime.date, datetime.date]:
     today = datetime.date.today()
     a_day_early_next_month = today.replace(day=28) + datetime.timedelta(days=4)
 
@@ -106,17 +112,31 @@ def get_monthly_params(input_start, input_end):
         end_date = int(input_end)
     except ValueError:
         # Default to the last day of next month
-        a_day_early_month_after_next = a_day_early_next_month.replace(day=28) + datetime.timedelta(days=4)
-        last_day_next_month = a_day_early_month_after_next - datetime.timedelta(days=a_day_early_month_after_next.day)
+        a_day_early_month_after_next = a_day_early_next_month.replace(
+            day=28
+        ) + datetime.timedelta(days=4)
+        last_day_next_month = a_day_early_month_after_next - datetime.timedelta(
+            days=a_day_early_month_after_next.day
+        )
         end_date = last_day_next_month.day
 
     return (
-        datetime.date(day=start_date, month=a_day_early_next_month.month, year=a_day_early_next_month.year),
-        datetime.date(day=end_date, month=a_day_early_next_month.month, year=a_day_early_next_month.year)
+        datetime.date(
+            day=start_date,
+            month=a_day_early_next_month.month,
+            year=a_day_early_next_month.year,
+        ),
+        datetime.date(
+            day=end_date,
+            month=a_day_early_next_month.month,
+            year=a_day_early_next_month.year,
+        ),
     )
 
 
-def get_weekly_params(input_start, input_end):
+def get_weekly_params(
+    input_start: str, input_end: str
+) -> tuple[datetime.date, datetime.date]:
     today = datetime.date.today()
 
     start_diff = 7 + get_weekday_from_input(input_start)
@@ -125,45 +145,48 @@ def get_weekly_params(input_start, input_end):
     end = start + datetime.timedelta(days=end_diff)
 
     assert end.weekday() > start.weekday()
+
     return start, end
 
 
-def get_weekday_from_input(input):
+def get_weekday_from_input(input: str):
     """
-    Allows inputs like "Monday" | "tuesday" | "wed" | "thu" | "4" | 5
+    Allows inputs like "Monday" | "tuesday" | "wed" | "thu" | "4"
     Returns day of the week integer with Monday == 0
     """
     match input.lower()[:3]:
-        case "mon" | "0" | 0:
+        case "mon" | "0":
             weekday = 0
-        case "tue" | "1" | 1:
+        case "tue" | "1":
             weekday = 1
-        case "wed" | "2" | 2:
+        case "wed" | "2":
             weekday = 2
-        case "thu" | "3" | 3:
+        case "thu" | "3":
             weekday = 3
-        case "fri" | "4" | 4:
+        case "fri" | "4":
             weekday = 4
-        case "sat" | "5" | 5:
+        case "sat" | "5":
             weekday = 5
-        case "sun" | "6" | 6:
+        case "sun" | "6":
             weekday = 6
         case _:
-            raise Exception("Invalid input")
+            raise Exception("Invalid weekday input")
+
     return weekday
 
 
-with sync_playwright() as playwright:
-    try:
-        run(playwright)
-        print("Finished")
-        # NB super important these are the last two lines printed
-        print(f'{os.environ["OUTPUT_START_DATE"]}')
-        print(f'{os.environ["OUTPUT_END_DATE"]}')
+if __name__ == "__main__":
+    with sync_playwright() as playwright:
+        try:
+            run(playwright)
+            print("Finished")
+            # NB super important these are the last two lines printed
+            print(f'{os.environ["OUTPUT_START_DATE"]}')
+            print(f'{os.environ["OUTPUT_END_DATE"]}')
 
-    except Exception as e:
-        print(e, file=sys.stderr)
-        # NB super important these are the last two lines printed
-        print(f'{os.environ["OUTPUT_START_DATE"]}')
-        print(f'{os.environ["OUTPUT_END_DATE"]}')
-        sys.exit(1)
+        except Exception as e:
+            print(e, file=sys.stderr)
+            # NB super important these are the last two lines printed
+            print(f'{os.environ["OUTPUT_START_DATE"]}')
+            print(f'{os.environ["OUTPUT_END_DATE"]}')
+            sys.exit(1)
