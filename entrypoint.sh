@@ -29,5 +29,5 @@ if [ $ret -ne 0 ]; then
 fi
 
 echo "success=1" >> "$GITHUB_OUTPUT"
-echo "Script completed successfully
+echo "Script completed successfully"
 exit 0
