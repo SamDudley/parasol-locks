@@ -1,11 +1,12 @@
 #!/bin/bash
 
 # Run python script, capturing all stdout as we go
+py_err=$( python /app/lock.py 2>&1 1>log.txt )
+
 output=()
 while read line ; do
-  output+=("${line}")
-done < <(python /app/lock.py)
-ret=$?
+    output+=("${line}")
+done < log.txt
 
 # Assign last two lines of output to vars
 START_DATE="${output[-2]}"
@@ -23,11 +24,13 @@ while [ $i -le $(( ${#output[@]} - 3 )) ]; do
 done
 
 # Handle return state
-if [ $ret -ne 0 ]; then
+if [ -z "$py_err" ]; then
+    echo "success=1" >> "$GITHUB_OUTPUT"
+    echo "Script completed successfully"
+    exit 0
+else
     echo "success=0" >> "$GITHUB_OUTPUT"
+    echo "error=$py_err" >> "$GITHUB_OUTPUT"
+    echo "Script completed with error: $py_err"
     exit 1
 fi
-
-echo "success=1" >> "$GITHUB_OUTPUT"
-echo "Script completed successfully"
-exit 0
