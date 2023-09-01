@@ -106,13 +106,25 @@ def get_monthly_params(input_start, input_end):
         end_date = int(input_end)
     except ValueError:
         # Default to the last day of next month
-        a_day_early_month_after_next = a_day_early_next_month.replace(day=28) + datetime.timedelta(days=4)
-        last_day_next_month = a_day_early_month_after_next - datetime.timedelta(days=a_day_early_month_after_next.day)
+        a_day_early_month_after_next = a_day_early_next_month.replace(
+            day=28
+        ) + datetime.timedelta(days=4)
+        last_day_next_month = a_day_early_month_after_next - datetime.timedelta(
+            days=a_day_early_month_after_next.day
+        )
         end_date = last_day_next_month.day
 
     return (
-        datetime.date(day=start_date, month=a_day_early_next_month.month, year=a_day_early_next_month.year),
-        datetime.date(day=end_date, month=a_day_early_next_month.month, year=a_day_early_next_month.year)
+        datetime.date(
+            day=start_date,
+            month=a_day_early_next_month.month,
+            year=a_day_early_next_month.year,
+        ),
+        datetime.date(
+            day=end_date,
+            month=a_day_early_next_month.month,
+            year=a_day_early_next_month.year,
+        ),
     )
 
 

@@ -23,6 +23,8 @@ outputs:
     description: 'The date the lock was started for in YYYY-MM-DD format'
   end-date:
     description: 'The date the lock was created until in YYYY-MM-DD format'
+  error:
+    description: 'Error message. Only present if success==0 (i.e. if the job failed)'
 
 runs:
   using: docker
