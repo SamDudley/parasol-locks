@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Run python script, capturing all stdout as we go
-py_err=$( python /app/lock.py 2>&1 1>log.txt )
+py_err=$( python /app/lock.py 2>&1 1>stdout.txt )
 
 output=()
 while read line ; do
     output+=("${line}")
-done < log.txt
+done < stdout.txt
 
 # Assign last two lines of output to vars
 START_DATE="${output[-2]}"
